@@ -4,26 +4,27 @@ import org.bitbucket.videso.model.BlackjackCard;
 import org.bitbucket.videso.service.BlackjackPointsCalculator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlackjackPointsCalculatorImpl implements BlackjackPointsCalculator {
 
     public Integer calculatePoints(List<BlackjackCard> cards) {
-        Integer resultValue = 0;
+        return cards.stream()
+                .filter(card -> !card.isHidden())
+                .map(BlackjackCard::getValue)
+                .collect(Collectors.toList())
+                .stream()
+                .reduce(0, (left, right) -> {
+                    if (isAce(right) && left + right > 21) {
+                        left += 1;
+                    } else {
+                        left += right;
+                    }
+                    return left;
+                });
+    }
 
-        for (BlackjackCard card : cards) {
-            if (card.isHidden()) continue;
-
-            if (card.getRank().equalsIgnoreCase("ace")) {
-                if ((resultValue + card.getValue()) > 21) {
-                    resultValue += 1;
-                } else {
-                    resultValue += card.getValue();
-                }
-            } else {
-                resultValue += card.getValue();
-            }
-        }
-
-        return resultValue;
+    private boolean isAce(Integer points) {
+        return (points >= 11);
     }
 }

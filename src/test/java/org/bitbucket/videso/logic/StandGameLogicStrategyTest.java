@@ -13,13 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class StandGameLogicStrategyTest {
 
     private StandGameLogicStrategy standGameLogicStrategy;
     private Move supportedMoveType;
 
-    private BlackjackPointsCalculator blackjackPointsCalculator;
     private Player currentTurn;
 
     @Before
@@ -27,14 +30,15 @@ public class StandGameLogicStrategyTest {
         this.supportedMoveType = Move.STAND;
         this.standGameLogicStrategy = new StandGameLogicStrategy(supportedMoveType);
 
-        this.blackjackPointsCalculator = new BlackjackPointsCalculatorImpl();
-        this.currentTurn = new Player(this.blackjackPointsCalculator, "player");
+        this.currentTurn = mock(Player.class);
     }
 
     @Test
     public void shouldSetPlayerEndTurnFlagToTrue() {
         //Given
         List<BlackjackCard> deck = new ArrayList<>();
+        doCallRealMethod().when(currentTurn).setEndedTurn(anyBoolean());
+        when(currentTurn.isEndedTurn()).thenCallRealMethod();
 
         //When
         standGameLogicStrategy.process(currentTurn, deck, supportedMoveType);
@@ -46,7 +50,7 @@ public class StandGameLogicStrategyTest {
     @Test(expected = IllegalStateException.class)
     public void shouldThrowExceptionIfNoSpecialCaseFoundForPoints() {
         //Given
-        currentTurn.setPoints(-1);
+        when(currentTurn.getPoints()).thenReturn(-1);
 
         //When
         standGameLogicStrategy.process(currentTurn, new ArrayList<>(), supportedMoveType);

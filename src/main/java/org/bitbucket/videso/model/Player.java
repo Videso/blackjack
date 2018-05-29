@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 public class Player {
 
     private BlackjackPointsCalculator pointsCalculator;
@@ -19,6 +18,8 @@ public class Player {
     private Integer points = 0;
     private String name;
     private boolean isDealer = false;
+
+    @Setter
     private boolean endedTurn = false;
 
     @AssistedInject
@@ -35,6 +36,13 @@ public class Player {
         this.pointsCalculator = blackjackPointsCalculator;
         this.name = name;
         this.isDealer = isDealer;
+    }
+
+    public void makeAllCardsVisible(){
+        for(BlackjackCard card : cardsInHand){
+            card.setHidden(false);
+        }
+        updatePoints();
     }
 
     public void addCardToHand(BlackjackCard card) {
